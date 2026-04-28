@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>For You ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+  --pink: #ff4d6d;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.container {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  text-align: center;
+  max-width: 90%;
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9);}
+  to { opacity: 1; transform: scale(1);}
+}
+
+h1 { color: var(--pink); }
+
+button {
+  padding: 12px 25px;
+  margin: 10px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#yesBtn {
+  background: var(--pink);
+  color: white;
+}
+
+#noBtn {
+  background: #eee;
+  position: absolute;
+}
+
+.heart {
+  position: absolute;
+  animation: float 4s linear infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0); opacity: 1;}
+  100% { transform: translateY(-800px); opacity: 0;}
+}
+
+img {
+  width: 220px;
+  border-radius: 15px;
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="music" loop>
+  <source src="https://varghesemathew-gif.github.io/Varghese-mathew/music.mp3" type="audio/mpeg">
+</audio>
+
+<div id="app" class="container"></div>
+
+<script>
+// ---------- CONFIG ----------
+const params = new URLSearchParams(location.search);
+const name = params.get("name") || "Pookie";
+const customMsg = params.get("msg") || "You are my everything ❤️";
+
+const app = document.getElementById("app");
+let noClicks = 0;
+
+// ---------- MUSIC ----------
+function playMusic() {
+  const music = document.getElementById("music");
+  music.play().catch(() => {
+    document.body.addEventListener("click", () => music.play(), { once: true });
+  });
+}
+
+// ---------- SCENE 1: TYPING ----------
+function typingScene() {
+  const text = `Hey ${name}... I have something special for you 💭`;
+  let i = 0;
+  app.innerHTML = "";
+
+  function type() {
+    if (i < text.length) {
+      app.innerHTML += text[i++];
+      setTimeout(type, 40);
+    } else {
+      setTimeout(countdownScene, 1000);
+    }
+  }
+  type();
+}
+
+// ---------- SCENE 2: COUNTDOWN ----------
+function countdownScene() {
+  let n = 3;
+  const interval = setInterval(() => {
+    app.innerHTML = `<h1>${n}</h1>`;
+    n--;
+    if (n === 0) {
+      clearInterval(interval);
+      questionScene();
+    }
+  }, 800);
+}
+
+// ---------- SCENE 3: QUESTION ----------
+function questionScene() {
+  app.innerHTML = `
+    <h1>${name}, will you be my Valentine? ❤️</h1>
+    <button id="yesBtn">Yes 💖</button>
+    <button id="noBtn">No 😢</button>
+  `;
+
+  const noBtn = document.getElementById("noBtn");
+  const yesBtn = document.getElementById("yesBtn");
+
+  noBtn.addEventListener("click", () => {
+    noClicks++;
+    if (noClicks === 1) {
+      noBtn.innerText = "Pookie pls 😭";
+    } else {
+      dodge(noBtn);
+    }
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (noClicks >= 2) {
+      const rect = noBtn.getBoundingClientRect();
+      const dist = Math.hypot(e.clientX - rect.x, e.clientY - rect.y);
+      if (dist < 120) dodge(noBtn);
+    }
+  });
+
+  yesBtn.onclick = endingScene;
+}
+
+// ---------- BUTTON ESCAPE ----------
+function dodge(btn) {
+  const x = Math.random() * (window.innerWidth - 120);
+  const y = Math.random() * (window.innerHeight - 60);
+  btn.style.left = x + "px";
+  btn.style.top = y + "px";
+}
+
+// ---------- SCENE 4: END ----------
+function endingScene() {
+  app.innerHTML = `
+    <h1>I knew you'd choose me ❤️</h1>
+    <p>${customMsg}</p>
+    <img src="https://varghesemathew-gif.github.io/Varghese-mathew/rabbit.mp4">
+  `;
+
+  playMusic();
+  hearts();
+}
+
+// ---------- HEARTS ----------
+function hearts() {
+  setInterval(() => {
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.innerText = "❤️";
+    h.style.left = Math.random() * window.innerWidth + "px";
+    h.style.top = "100%";
+    h.style.fontSize = (Math.random() * 20 + 12) + "px";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 4000);
+  }, 180);
+}
+
+// START
+typingScene();
+</script>
+
+</body>
+</html>
